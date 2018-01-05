@@ -8,4 +8,9 @@
         android:title="nearby"
         android:icon="@drawable/ic_near_me"
         app:showAsAction="always" />
+    <item android:id="@+id/action_map"
+        android:orderInCategory="200"
+        android:title="map"
+        android:icon="@drawable/ic_map"
+        app:showAsAction="always" />
 </menu>

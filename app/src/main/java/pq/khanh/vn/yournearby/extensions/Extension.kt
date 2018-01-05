@@ -1,6 +1,5 @@
 package pq.khanh.vn.yournearby.extensions
 
-import android.app.Activity
 import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
@@ -21,7 +20,7 @@ fun Context.i(message : String){
     Log.e(this.javaClass.simpleName, message)
 }
 fun ViewGroup.inflateLayout(layoutId : Int, attachToRoot: Boolean = false): View? {
-    return LayoutInflater.from(context).inflate(layoutId, this, attachToRoot)
+    return LayoutInflater.from(this?.context).inflate(layoutId, this, attachToRoot)
 }
 
 fun Context.showToast(message: String) = Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
