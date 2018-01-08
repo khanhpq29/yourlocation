@@ -13,4 +13,9 @@
         android:title="map"
         android:icon="@drawable/ic_map"
         app:showAsAction="always" />
+    <item android:id="@+id/actions_weather"
+        android:orderInCategory="200"
+        android:title="weather"
+        android:icon="@drawable/ic_weather"
+        app:showAsAction="always" />
 </menu>

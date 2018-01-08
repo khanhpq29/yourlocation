@@ -6,51 +6,54 @@ import android.content.Intent
 import android.location.Geocoder
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.*
 import com.google.android.gms.awareness.Awareness
 import com.google.android.gms.awareness.snapshot.LocationResult
 import com.google.android.gms.awareness.snapshot.PlacesResult
+import com.google.android.gms.awareness.snapshot.WeatherResult
 import com.google.android.gms.common.api.GoogleApiClient
+import com.google.android.gms.maps.model.LatLng
 import com.jakewharton.rxbinding2.view.RxView
 import io.reactivex.Single
 import io.reactivex.disposables.CompositeDisposable
-import kotlinx.android.synthetic.main.activity_location.*
+import kotlinx.android.synthetic.main.fragment_location.*
 import permissions.dispatcher.NeedsPermission
 import permissions.dispatcher.OnPermissionDenied
 import permissions.dispatcher.RuntimePermissions
 import pq.khanh.vn.yournearby.R
 import pq.khanh.vn.yournearby.extensions.inflateLayout
+import pq.khanh.vn.yournearby.extensions.showToast
 import pq.khanh.vn.yournearby.ui.MapActivity
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-/**
- * Created by khanhpq on 1/5/18.
- */
 @RuntimePermissions
 class LocationFragment : Fragment() {
-    private val compositDispose: CompositeDisposable by lazy { CompositeDisposable() }
+    private val compositeDispose: CompositeDisposable by lazy { CompositeDisposable() }
     private lateinit var googleClient: GoogleApiClient
     private var cityLat: Double = 0.0
     private var cityLon: Double = 0.0
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
-                              savedInstanceState: Bundle?) = container?.inflateLayout(R.layout.activity_location)
+                              savedInstanceState: Bundle?) = container?.inflateLayout(R.layout.fragment_location)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setHasOptionsMenu(true)
         googleClient = GoogleApiClient.Builder(context!!).addApi(Awareness.API).build()
         googleClient.connect()
         setUpListener()
-        setHasOptionsMenu(true)
     }
+
     private fun setUpListener() {
-        compositDispose.add(RxView.clicks(fab)
+        compositeDispose.add(RxView.clicks(fab)
                 .throttleFirst(150, TimeUnit.MILLISECONDS)
                 .subscribe { getLocationWithPermissionCheck() })
     }
 
     @OnPermissionDenied(Manifest.permission.ACCESS_FINE_LOCATION)
-    fun deniedLocation() {}
+    fun deniedLocation() {
+    }
 
     @SuppressLint("MissingPermission")
     @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -66,7 +69,7 @@ class LocationFragment : Fragment() {
                         cityLon = location.longitude
                         tvLat.text = cityLat.toString()
                         tvLon.text = cityLon.toString()
-                        compositDispose.add(Single.fromCallable {
+                        compositeDispose.add(Single.fromCallable {
                             Geocoder(context, Locale.getDefault())
                         }.subscribe({ geocoder: Geocoder ->
                             val addresses = geocoder.getFromLocation(cityLat, cityLon, 1)
@@ -86,7 +89,7 @@ class LocationFragment : Fragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        compositDispose.clear()
+        compositeDispose.clear()
         if (googleClient.isConnected) googleClient.disconnect()
     }
 
@@ -94,18 +97,19 @@ class LocationFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
         inflater?.inflate(R.menu.menu_main, menu)
     }
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.actions_near -> {
                 checkPlaceWithPermissionCheck()
                 true
             }
             R.id.action_map -> {
-                val intent = Intent(context, MapActivity::class.java)
-                startActivity(intent)
+                gotoMapWithPermissionCheck()
+                true
+            }
+            R.id.actions_weather -> {
+                checkWeather()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -114,8 +118,29 @@ class LocationFragment : Fragment() {
 
     @SuppressLint("MissingPermission")
     @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+    fun checkWeather() {
+        Awareness.SnapshotApi.getWeather(googleClient).setResultCallback { weatherResult: WeatherResult ->
+            if (!weatherResult.status.isSuccess) {
+                return@setResultCallback
+            } else {
+                context?.showToast(weatherResult.weather.humidity.toString())
+            }
+        }
+    }
+
+    @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
+    fun gotoMap() {
+        Log.d("lat ", "$cityLat")
+        val intent = Intent(context, MapActivity::class.java)
+        val placeLocation = LatLng(cityLat, cityLon)
+        intent.putExtra("location_coord", placeLocation)
+        startActivity(intent)
+    }
+
+    @SuppressLint("MissingPermission")
+    @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
     fun checkPlace() {
-        compositDispose.add(Single.fromCallable {
+        compositeDispose.add(Single.fromCallable {
             Awareness.SnapshotApi.getPlaces(googleClient)
                     .setResultCallback { placesResult: PlacesResult ->
                         if (!placesResult.status.isSuccess) {
@@ -123,7 +148,7 @@ class LocationFragment : Fragment() {
                         } else {
                             val placeLikelihoodsList = placesResult.placeLikelihoods
                             for (placeLikelihood in placeLikelihoodsList) {
-//                                i("${placeLikelihood.place.latLng}, ${placeLikelihood.place.name}")
+//                                Log.i("near", "${placeLikelihood.place.latLng}, ${placeLikelihood.place.name}")
                             }
                         }
                     }
