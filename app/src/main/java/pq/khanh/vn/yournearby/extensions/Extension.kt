@@ -10,17 +10,21 @@ import android.widget.Toast
 /**
  * Created by khanhpq on 1/5/18.
  */
-fun Context.d(message : String){
+fun Any.d(message: String) {
     Log.d(this.javaClass.simpleName, message)
 }
-fun Context.e(message : String){
+
+fun Any.e(message: String) {
     Log.e(this.javaClass.simpleName, message)
 }
-fun Context.i(message : String){
+
+fun Context.i(message: String) {
     Log.e(this.javaClass.simpleName, message)
 }
-fun ViewGroup.inflateLayout(layoutId : Int, attachToRoot: Boolean = false): View? {
+
+fun ViewGroup?.inflateLayout(layoutId: Int, attachToRoot: Boolean = false): View {
     return LayoutInflater.from(this?.context).inflate(layoutId, this, attachToRoot)
 }
 
 fun Context.showToast(message: String) = Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+

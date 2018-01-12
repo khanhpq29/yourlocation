@@ -3,13 +3,10 @@ package pq.khanh.vn.yournearby.ui.location
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.location.Geocoder
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.*
 import com.google.android.gms.awareness.Awareness
-import com.google.android.gms.awareness.snapshot.LocationResult
 import com.google.android.gms.awareness.snapshot.PlacesResult
 import com.google.android.gms.awareness.snapshot.WeatherResult
 import com.google.android.gms.common.api.GoogleApiClient
@@ -22,63 +19,39 @@ import permissions.dispatcher.NeedsPermission
 import permissions.dispatcher.OnPermissionDenied
 import permissions.dispatcher.RuntimePermissions
 import pq.khanh.vn.yournearby.R
+import pq.khanh.vn.yournearby.extensions.d
+import pq.khanh.vn.yournearby.extensions.e
 import pq.khanh.vn.yournearby.extensions.inflateLayout
 import pq.khanh.vn.yournearby.extensions.showToast
-import pq.khanh.vn.yournearby.ui.MapActivity
-import java.util.*
+import pq.khanh.vn.yournearby.ui.map.MapActivity
 import java.util.concurrent.TimeUnit
 
 @RuntimePermissions
 class LocationFragment : Fragment() {
     private val compositeDispose: CompositeDisposable by lazy { CompositeDisposable() }
-    private lateinit var googleClient: GoogleApiClient
+    private var googleClient: GoogleApiClient? = null
     private var cityLat: Double = 0.0
     private var cityLon: Double = 0.0
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?) = container?.inflateLayout(R.layout.fragment_location)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setHasOptionsMenu(true)
-        googleClient = GoogleApiClient.Builder(context!!).addApi(Awareness.API).build()
-        googleClient.connect()
+        googleClient = activity?.let { GoogleApiClient.Builder(it).addApi(Awareness.API).build() }
+        googleClient?.connect()
         setUpListener()
     }
 
     private fun setUpListener() {
         compositeDispose.add(RxView.clicks(fab)
                 .throttleFirst(150, TimeUnit.MILLISECONDS)
-                .subscribe { getLocationWithPermissionCheck() })
+                .subscribe { })
     }
 
     @OnPermissionDenied(Manifest.permission.ACCESS_FINE_LOCATION)
     fun deniedLocation() {
-    }
-
-    @SuppressLint("MissingPermission")
-    @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
-    fun getLocation() {
-        Awareness.SnapshotApi
-                .getLocation(googleClient)
-                .setResultCallback { locationResult: LocationResult ->
-                    if (!locationResult.status.isSuccess) {
-                        return@setResultCallback
-                    } else {
-                        val location = locationResult.location
-                        cityLat = location.latitude
-                        cityLon = location.longitude
-                        tvLat.text = cityLat.toString()
-                        tvLon.text = cityLon.toString()
-                        compositeDispose.add(Single.fromCallable {
-                            Geocoder(context, Locale.getDefault())
-                        }.subscribe({ geocoder: Geocoder ->
-                            val addresses = geocoder.getFromLocation(cityLat, cityLon, 1)
-                            val cityName = addresses[0].getAddressLine(0)
-                            tvCurrentLocation.text = cityName
-                        }))
-                    }
-                }
-
     }
 
     @SuppressLint("NeedOnRequestPermissionsResult")
@@ -87,10 +60,11 @@ class LocationFragment : Fragment() {
         onRequestPermissionsResult(requestCode, grantResults)
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onDestroyView() {
+        super.onDestroyView()
+        d("on destroy view")
         compositeDispose.clear()
-        if (googleClient.isConnected) googleClient.disconnect()
+        googleClient?.let { if (it.isConnected) it.disconnect() }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater?) {
@@ -109,7 +83,7 @@ class LocationFragment : Fragment() {
                 true
             }
             R.id.actions_weather -> {
-                checkWeather()
+                checkWeatherWithPermissionCheck()
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -130,7 +104,7 @@ class LocationFragment : Fragment() {
 
     @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
     fun gotoMap() {
-        Log.d("lat ", "$cityLat")
+        e("$cityLat")
         val intent = Intent(context, MapActivity::class.java)
         val placeLocation = LatLng(cityLat, cityLon)
         intent.putExtra("location_coord", placeLocation)
@@ -154,4 +128,5 @@ class LocationFragment : Fragment() {
                     }
         }.subscribe())
     }
+
 }

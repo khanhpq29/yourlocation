@@ -7,5 +7,4 @@ import com.google.android.gms.awareness.snapshot.LocationResult
  * Created by khanhpq on 1/5/18.
  */
 class RxAwareness{
-
 }
