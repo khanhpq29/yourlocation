@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.SearchView
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
 import com.google.android.gms.awareness.Awareness
 import com.google.android.gms.common.api.GoogleApiClient
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -22,17 +21,21 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.activity_map.*
 import permissions.dispatcher.NeedsPermission
+import permissions.dispatcher.OnPermissionDenied
 import permissions.dispatcher.RuntimePermissions
 import pq.khanh.vn.yournearby.R
 import pq.khanh.vn.yournearby.extensions.*
+import pq.khanh.vn.yournearby.ui.YourApplication
 import pq.khanh.vn.yournearby.ui.recognise.RecogniseActivity
 import pq.khanh.vn.yournearby.utils.AwarenessApi
+import java.lang.ref.WeakReference
 import java.util.*
 
 @RuntimePermissions
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var coord: LatLng
     private var googleMap: GoogleMap? = null
+    private lateinit var mapRef :WeakReference<GoogleMap?>
     private lateinit var googleClient: GoogleApiClient
     private val compositeDispose: CompositeDisposable by lazy { CompositeDisposable() }
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,6 +44,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
         setContentView(R.layout.activity_map)
         googleClient = GoogleApiClient.Builder(this).addApi(Awareness.API).build()
         googleClient.connect()
+        mapRef = WeakReference(googleMap)
         coord = intent?.getParcelableExtra("location_coord") ?: LatLng(0.0, 0.0)
         d("${coord.latitude}, ${coord.longitude}")
         val supportMap = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
@@ -49,6 +53,7 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onMapReady(map: GoogleMap?) {
         d("onMap ready")
+        googleMap = mapRef.get()
         googleMap = map
         googleMap?.mapType = GoogleMap.MAP_TYPE_NORMAL
         showLocationOnMapWithPermissionCheck(googleMap!!)
@@ -58,6 +63,17 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         onRequestPermissionsResult(requestCode, grantResults)
+    }
+    
+    @OnPermissionDenied(Manifest.permission.ACCESS_FINE_LOCATION)
+    fun showDeniedDialog(){
+//        AlertDialog.Builder(this)
+//                .setMessage("Location requirement")
+//                .setMessage("Location is not active")
+//                .setPositiveButton("Ok", {dialog, which ->  })
+//                .create()
+//                .show()
+        finish()
     }
 
     @NeedsPermission(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -77,7 +93,9 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
                     locationTitle.text = cityName
                     map.addMarker(MarkerOptions().position(t).title("You"))
                     map.moveCamera(CameraUpdateFactory.newLatLngZoom(t, 18f))
-                }, { progress.visibility = View.GONE }))
+                }, {
+                    progress.hide(true)
+                }))
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -97,7 +115,11 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
     override fun onDestroy() {
         super.onDestroy()
-        googleMap?.clear()
+        if (googleClient.isConnected){
+            googleClient.disconnect()
+        }
         compositeDispose.clear()
+        val refWatcher = YourApplication.getRefWatcher(this)
+        refWatcher.watch(this)
     }
 }

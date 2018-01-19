@@ -59,6 +59,8 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.4.0'
     //retrofit
     implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+    //okhttp
+    compile 'com.squareup.okhttp3:okhttp:3.9.1'
     //dependency
     kapt "com.google.dagger:dagger-compiler:2.11"
     compile "com.google.dagger:dagger:2.11"
@@ -66,4 +68,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
+    implementation 'com.android.support:gridlayout-v7:27.0.2'
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.4'
 }

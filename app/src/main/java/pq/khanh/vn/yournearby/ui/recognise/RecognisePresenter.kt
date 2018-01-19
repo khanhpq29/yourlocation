@@ -14,16 +14,21 @@ import javax.inject.Inject
 /**
  * Created by khanhpq on 1/11/18.
  */
-class RecognisePresenter /*@Inject constructor*/(var compositeDispose: CompositeDisposable, var contracView : RecogniseContract.View) : RecogniseContract.Presenter{
+class RecognisePresenter /*@Inject constructor*/(private var compositeDispose: CompositeDisposable, private var contractView : RecogniseContract.View) : RecogniseContract.Presenter{
 //    private lateinit var compositeDispose: CompositeDisposable
 //    private lateinit var contracView : RecogniseContract.View
     override fun getListLikeliHood(googleApiClient: GoogleApiClient, list: MutableList<PlaceLikelihood>) {
         compositeDispose.add(AwarenessApi.checkNearbyLocation(googleApiClient)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe { contractView.showProgress() }
+                .doOnSuccess { contractView.hideProgress() }
                 .subscribe({ t: MutableList<PlaceLikelihood> ->
-                    contracView.showLikeliHood(t)
-                }, { error -> error.printStackTrace() }))
+                    contractView.showLikeliHood(t)
+                }, {error: Throwable ->
+                    error.printStackTrace()
+                    contractView.hideProgress()
+                }))
     }
 
     override fun dispose() {
@@ -31,7 +36,7 @@ class RecognisePresenter /*@Inject constructor*/(var compositeDispose: Composite
     }
 
     override fun initView(view: RecogniseContract.View) {
-        contracView = view
+        contractView = view
         compositeDispose = CompositeDisposable()
     }
 }

@@ -9,6 +9,9 @@ import com.google.android.gms.location.places.PlaceLikelihood
 interface RecogniseContract {
     interface View{
         fun showLikeliHood(list : MutableList<PlaceLikelihood>)
+        fun initData()
+        fun showProgress()
+        fun hideProgress()
     }
     interface Presenter{
         fun getListLikeliHood(googleApiClient: GoogleApiClient, list : MutableList<PlaceLikelihood>)

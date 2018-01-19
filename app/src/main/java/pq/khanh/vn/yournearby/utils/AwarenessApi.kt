@@ -13,7 +13,6 @@ import io.reactivex.*
  * Created by khanhpq on 1/8/18.
  */
 object AwarenessApi {
-
     @SuppressLint("MissingPermission")
     fun currentLocation(googleApiClient: GoogleApiClient): Maybe<LatLng> {
         return Maybe.create { emitter: MaybeEmitter<LatLng> ->
@@ -29,15 +28,14 @@ object AwarenessApi {
     }
 
     @SuppressLint("MissingPermission")
-    fun checkNearbyLocation(googleApiClient: GoogleApiClient): Maybe<MutableList<PlaceLikelihood>> {
-        return Maybe.create { emitter ->
+    fun checkNearbyLocation(googleApiClient: GoogleApiClient): Single<MutableList<PlaceLikelihood>> {
+        return Single.create { emitter ->
             Awareness.SnapshotApi.getPlaces(googleApiClient)
-                    .setResultCallback { placesResult: PlacesResult ->
-                        if (!placesResult.status.isSuccess) {
+                    .setResultCallback { placesResult: PlacesResult? ->
+                        if (placesResult?.status?.isSuccess == true) {
                             emitter.onError(Throwable())
                         } else {
-                            emitter.onSuccess(placesResult.placeLikelihoods)
-                            emitter.onComplete()
+                            emitter.onSuccess(placesResult?.placeLikelihoods ?: mutableListOf())
                         }
                     }
         }
