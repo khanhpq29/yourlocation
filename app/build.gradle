@@ -44,7 +44,7 @@ dependencies {
     implementation 'com.android.support.constraint:constraint-layout:1.0.2'
     implementation 'com.android.support:design:27.0.2'
     //awareness
-    compile 'com.google.android.gms:play-services-awareness:11.4.0'
+    compile 'com.google.android.gms:play-services-awareness:11.8.0'
     //permission
     compile("com.github.hotchemi:permissionsdispatcher:3.0.1")
     kapt "com.github.hotchemi:permissionsdispatcher-processor:3.0.1"
@@ -68,6 +68,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
 
-    implementation 'com.google.android.gms:play-services-location:11.6.0'
+    implementation 'com.google.android.gms:play-services-location:11.8.0'
     debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.4'
 }

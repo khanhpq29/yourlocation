@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="com.google.android.gms.permission.ACTIVITY_RECOGNITION" />
 
     <application
         android:name=".ui.YourApplication"
@@ -24,20 +25,31 @@
         <activity
             android:name=".ui.map.MapActivity"
             android:configChanges="screenSize|keyboardHidden|orientation">
+
+        </activity>
+        <activity
+            android:name=".ui.location.LocationActivity"
+            android:label="@string/title_activity_location"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".ui.recognise.RecogniseActivity"
+            android:label="Recognisation">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".ui.location.LocationActivity"
-            android:label="@string/title_activity_location"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity
-            android:name=".ui.recognise.RecogniseActivity"
-            android:label="Recognisation" />
-        <activity android:name=".ui.SplashActivity"></activity>
+
+        <activity android:name=".ui.SplashActivity" />
+
+        <service
+            android:name=".service.ActivityService"
+            android:exported="false" />
+        <service android:name=".service.BackgroundDetectedActivitiesService" />
+
+        <activity android:name=".ui.example.DemoActivity">
+        </activity>
     </application>
 
 </manifest>

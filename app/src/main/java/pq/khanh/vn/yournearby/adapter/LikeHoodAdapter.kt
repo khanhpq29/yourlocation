@@ -2,7 +2,6 @@ package pq.khanh.vn.yournearby.adapter
 
 import android.support.v7.widget.RecyclerView
 import android.view.ViewGroup
-import com.google.android.gms.location.places.PlaceLikelihood
 import pq.khanh.vn.yournearby.R
 import pq.khanh.vn.yournearby.extensions.inflateLayout
 import pq.khanh.vn.yournearby.utils.Constant
@@ -10,31 +9,23 @@ import pq.khanh.vn.yournearby.utils.Constant
 /**
  * Created by khanhpq on 1/10/18.
  */
-class LikeHoodAdapter(private val likelihoodList: MutableList<PlaceLikelihood>, private val isGrid: Boolean) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder?, position: Int) {
-        if (holder is LikeHoodHolder) {
-            holder?.bind(likelihoodList[position])
-        } else if (holder is LikeLiHoodGridHolder) {
-            holder?.bind(likelihoodList[position])
-        }
-    }
+class LikeHoodAdapter(private var likelihoodList: MutableList<String>) : RecyclerView.Adapter<LikeHoodHolder>() {
+    private var isSwitch = true
 
-    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): RecyclerView.ViewHolder {
-        val holder = if (viewType == Constant.LIST_TYPE) {
-            val view = parent.inflateLayout(R.layout.item_likelihood)
-            LikeHoodHolder(view)
+    override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): LikeHoodHolder {
+        val view = if (viewType == Constant.LIST_TYPE) {
+            parent.inflateLayout(R.layout.item_likelihood)
         } else {
-            val view = parent.inflateLayout(R.layout.item_likelihood_grid)
-            LikeLiHoodGridHolder(view)
+            parent.inflateLayout(R.layout.item_likelihood_grid)
         }
-        return holder
+        return LikeHoodHolder(view)
     }
 
     override fun getItemViewType(position: Int): Int {
-        return if (isGrid) {
-            Constant.GRID_TYPE
-        } else {
+        return if (isSwitch) {
             Constant.LIST_TYPE
+        } else {
+            Constant.GRID_TYPE
         }
     }
 
@@ -42,4 +33,13 @@ class LikeHoodAdapter(private val likelihoodList: MutableList<PlaceLikelihood>, 
         return likelihoodList.size
     }
 
+    override fun onBindViewHolder(holder: LikeHoodHolder?, position: Int) {
+        val item = likelihoodList[position]
+        holder?.bind(item)
+    }
+
+    fun switchLayout() : Boolean{
+        isSwitch = !isSwitch
+        return isSwitch
+    }
 }
