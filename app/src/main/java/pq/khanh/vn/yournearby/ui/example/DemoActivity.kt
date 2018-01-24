@@ -13,6 +13,7 @@ import kotlinx.android.synthetic.main.activity_demo.*
 import pq.khanh.vn.yournearby.R
 import pq.khanh.vn.yournearby.adapter.LikeHoodAdapter
 import pq.khanh.vn.yournearby.extensions.d
+import pq.khanh.vn.yournearby.extensions.e
 import pq.khanh.vn.yournearby.utils.pref.AppReference
 
 class DemoActivity : AppCompatActivity() {
@@ -26,6 +27,7 @@ class DemoActivity : AppCompatActivity() {
         initData()
         d("size ${list.size}")
         initView()
+        e("${AppReference.getDisplayType(this)}")
     }
 
     private fun initView() {
@@ -45,8 +47,11 @@ class DemoActivity : AppCompatActivity() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        var isswitch = adapter.switchLayout()
-        if (isswitch) {
+        isList = AppReference.getDisplayType(this)
+//        var isSwitch = adapter.switchLayout()
+//        e("${AppReference.getDisplayType(this)}")
+        isList = adapter.switchLayout()
+        if (isList) {
             menu?.findItem(R.id.menu_switch)?.icon = ContextCompat.getDrawable(this, R.drawable.ic_list)
             adapter.switchLayout()
         } else {
@@ -59,12 +64,13 @@ class DemoActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (item?.itemId == R.id.menu_switch) {
             invalidateOptionsMenu()
-            val isSwitched = adapter.switchLayout()
-            if (isSwitched) {
+            isList = adapter.switchLayout()
+            if (isList) {
                 rclExample.layoutManager = LinearLayoutManager(this)
             } else {
                 rclExample.layoutManager = GridLayoutManager(this, 2)
             }
+            AppReference.setDisplayType(this, isList)
             adapter.notifyDataSetChanged()
             return true
         }
@@ -77,7 +83,12 @@ class DemoActivity : AppCompatActivity() {
 
     override fun onStop() {
         super.onStop()
-        AppReference.setDisplayType(this, isList)
+        d("stop")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        d("destroy")
     }
 
     private fun initData() {

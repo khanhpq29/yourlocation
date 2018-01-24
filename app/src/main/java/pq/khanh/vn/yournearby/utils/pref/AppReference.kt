@@ -15,7 +15,7 @@ object AppReference {
 
     fun setDisplayType(context: Context, isList : Boolean){
         val preference = getSharePreference(context)
-        preference.edit().putBoolean(DISPLAY_KEY, isList)
+        preference.edit().putBoolean(DISPLAY_KEY, isList).apply()
     }
 
     fun getDisplayType(context: Context) : Boolean{
