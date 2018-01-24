@@ -21,6 +21,7 @@ import pq.khanh.vn.yournearby.extensions.startIntent
 import pq.khanh.vn.yournearby.service.BackgroundDetectedActivitiesService
 import pq.khanh.vn.yournearby.ui.example.DemoActivity
 import pq.khanh.vn.yournearby.utils.Constant
+import pq.khanh.vn.yournearby.utils.pref.AppReference
 
 class RecogniseActivity : AppCompatActivity(), GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private lateinit var googleApiClient: GoogleApiClient
@@ -50,6 +51,7 @@ class RecogniseActivity : AppCompatActivity(), GoogleApiClient.ConnectionCallbac
             tvActivity.text = labelType
             tvConfidence.text = "Confidence : $confident"
         }
+        btnStartTrack.isEnabled = true
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -135,10 +137,12 @@ class RecogniseActivity : AppCompatActivity(), GoogleApiClient.ConnectionCallbac
         btnStopTrack.setOnClickListener {
             val intent = Intent(this, BackgroundDetectedActivitiesService::class.java)
             stopService(intent)
+            btnStartTrack.isEnabled = true
         }
     }
 
     private fun startTracking() {
+        btnStartTrack.isEnabled = false
         val intent = Intent(this, BackgroundDetectedActivitiesService::class.java)
         startService(intent)
     }

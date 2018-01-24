@@ -15,11 +15,11 @@ import pq.khanh.vn.yournearby.adapter.LikeHoodAdapter
 import pq.khanh.vn.yournearby.extensions.d
 import pq.khanh.vn.yournearby.extensions.e
 import pq.khanh.vn.yournearby.utils.pref.AppReference
+import java.util.*
 
 class DemoActivity : AppCompatActivity() {
     private lateinit var adapter: LikeHoodAdapter
     private var list: MutableList<String> = mutableListOf()
-    private var isList = true
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
@@ -34,11 +34,10 @@ class DemoActivity : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
         adapter = LikeHoodAdapter(list)
-        rclExample.layoutManager = LinearLayoutManager(this)
+        rclExample.layoutManager = LinearLayoutManager(this@DemoActivity)
         rclExample.adapter = adapter
         rclExample.setHasFixedSize(true)
         rclExample.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.VERTICAL))
-//        rclExample.addItemDecoration(DividerItemDecoration(this, LinearLayoutManager.HORIZONTAL))
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -47,11 +46,8 @@ class DemoActivity : AppCompatActivity() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        isList = AppReference.getDisplayType(this)
-//        var isSwitch = adapter.switchLayout()
-//        e("${AppReference.getDisplayType(this)}")
-        isList = adapter.switchLayout()
-        if (isList) {
+        var isSwitch = adapter.switchLayout()
+        if (isSwitch) {
             menu?.findItem(R.id.menu_switch)?.icon = ContextCompat.getDrawable(this, R.drawable.ic_list)
             adapter.switchLayout()
         } else {
@@ -64,7 +60,7 @@ class DemoActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (item?.itemId == R.id.menu_switch) {
             invalidateOptionsMenu()
-            isList = adapter.switchLayout()
+            val isList = adapter.switchLayout()
             if (isList) {
                 rclExample.layoutManager = LinearLayoutManager(this)
             } else {
@@ -78,6 +74,7 @@ class DemoActivity : AppCompatActivity() {
             finish()
             return true
         }
+
         return super.onOptionsItemSelected(item)
     }
 
@@ -99,10 +96,13 @@ class DemoActivity : AppCompatActivity() {
         list.add("android")
         list.add("android")
         list.add("android")
-        list.add("android")
-        list.add("android")
-        list.add("android")
-        list.add("android")
-        list.add("android")
+    }
+
+    private inline fun <reified T> checkType(number : Any){
+        if (number is T){
+            d("$number is true")
+        }else {
+            d("$number is false")
+        }
     }
 }

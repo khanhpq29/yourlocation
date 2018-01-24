@@ -8,7 +8,8 @@ import android.preference.PreferenceManager
  * Created by khanhpq on 1/23/18.
  */
 object AppReference {
-    const val DISPLAY_KEY = "display"
+    private const val DISPLAY_KEY = "display"
+    private const val EXAMPLE_KEY = "example"
     private fun getSharePreference(context: Context) : SharedPreferences{
         return PreferenceManager.getDefaultSharedPreferences(context)
     }
@@ -21,6 +22,16 @@ object AppReference {
     fun getDisplayType(context: Context) : Boolean{
         val preference = getSharePreference(context)
         return preference.getBoolean(DISPLAY_KEY, true)
+    }
+
+    fun setStringExample(context: Context, name : String){
+        val preference = getSharePreference(context)
+        preference.edit().putString(EXAMPLE_KEY, name).apply()
+    }
+
+    fun getStringExample(context: Context) : String {
+        val preference = getSharePreference(context)
+        return preference.getString(EXAMPLE_KEY, "")
     }
 
 }
