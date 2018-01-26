@@ -24,9 +24,7 @@
 
         <activity
             android:name=".ui.map.MapActivity"
-            android:configChanges="screenSize|keyboardHidden|orientation">
-
-        </activity>
+            android:configChanges="screenSize|keyboardHidden|orientation" />
         <activity
             android:name=".ui.location.LocationActivity"
             android:label="@string/title_activity_location"
@@ -40,7 +38,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
         <activity android:name=".ui.SplashActivity" />
 
         <service
@@ -48,8 +45,13 @@
             android:exported="false" />
         <service android:name=".service.BackgroundDetectedActivitiesService" />
 
-        <activity android:name=".ui.example.DemoActivity">
+        <activity android:name=".ui.example.DemoActivity" />
+        <activity android:name=".ui.calendar.CalendarActivity" />
+        <activity android:name=".ui.order.OrderActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+
         </activity>
+        <activity android:name=".ui.order.DetailOrderActivity"></activity>
     </application>
 
 </manifest>

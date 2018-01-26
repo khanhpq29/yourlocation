@@ -13,27 +13,24 @@ import kotlinx.android.synthetic.main.activity_demo.*
 import pq.khanh.vn.yournearby.R
 import pq.khanh.vn.yournearby.adapter.LikeHoodAdapter
 import pq.khanh.vn.yournearby.extensions.d
-import pq.khanh.vn.yournearby.extensions.e
+import pq.khanh.vn.yournearby.extensions.showToast
 import pq.khanh.vn.yournearby.utils.pref.AppReference
-import java.util.*
 
 class DemoActivity : AppCompatActivity() {
     private lateinit var adapter: LikeHoodAdapter
     private var list: MutableList<String> = mutableListOf()
+    private var isSwitch = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
         setContentView(R.layout.activity_demo)
         initData()
-        d("size ${list.size}")
         initView()
-        e("${AppReference.getDisplayType(this)}")
     }
 
     private fun initView() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
-        supportActionBar?.setDisplayShowHomeEnabled(true)
-        adapter = LikeHoodAdapter(list)
+        adapter = LikeHoodAdapter(list, {position -> showToast("$position")})
         rclExample.layoutManager = LinearLayoutManager(this@DemoActivity)
         rclExample.adapter = adapter
         rclExample.setHasFixedSize(true)
@@ -46,12 +43,15 @@ class DemoActivity : AppCompatActivity() {
     }
 
     override fun onPrepareOptionsMenu(menu: Menu?): Boolean {
-        var isSwitch = adapter.switchLayout()
+//        showToast("${AppReference.getDisplayType(this)}")
+        isSwitch = adapter.switchLayout()
         if (isSwitch) {
             menu?.findItem(R.id.menu_switch)?.icon = ContextCompat.getDrawable(this, R.drawable.ic_list)
+            menu?.findItem(R.id.menu_switch)?.title = "Switch to list view"
             adapter.switchLayout()
         } else {
             menu?.findItem(R.id.menu_switch)?.icon = ContextCompat.getDrawable(this, R.drawable.ic_grid)
+            menu?.findItem(R.id.menu_switch)?.title = "Switch to grid view"
             adapter.switchLayout()
         }
         return true
@@ -60,13 +60,13 @@ class DemoActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (item?.itemId == R.id.menu_switch) {
             invalidateOptionsMenu()
-            val isList = adapter.switchLayout()
-            if (isList) {
+            isSwitch = adapter.switchLayout()
+            if (isSwitch) {
                 rclExample.layoutManager = LinearLayoutManager(this)
             } else {
                 rclExample.layoutManager = GridLayoutManager(this, 2)
             }
-            AppReference.setDisplayType(this, isList)
+            AppReference.setDisplayType(this, isSwitch)
             adapter.notifyDataSetChanged()
             return true
         }

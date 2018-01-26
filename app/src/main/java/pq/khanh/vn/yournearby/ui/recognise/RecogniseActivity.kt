@@ -1,10 +1,12 @@
 package pq.khanh.vn.yournearby.ui.recognise
 
+//import pq.khanh.vn.yournearby.service.BackgroundActivityService
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.Bundle
+import android.support.annotation.IdRes
 import android.support.v4.content.LocalBroadcastManager
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.app.AppCompatDelegate
@@ -16,16 +18,18 @@ import com.google.android.gms.location.DetectedActivity
 import com.google.android.gms.location.LocationServices
 import kotlinx.android.synthetic.main.activity_recognise.*
 import pq.khanh.vn.yournearby.R
+import pq.khanh.vn.yournearby.extensions.d
+import pq.khanh.vn.yournearby.extensions.e
 import pq.khanh.vn.yournearby.extensions.startIntent
-//import pq.khanh.vn.yournearby.service.BackgroundActivityService
 import pq.khanh.vn.yournearby.service.BackgroundDetectedActivitiesService
 import pq.khanh.vn.yournearby.ui.example.DemoActivity
+import pq.khanh.vn.yournearby.ui.order.OrderActivity
 import pq.khanh.vn.yournearby.utils.Constant
-import pq.khanh.vn.yournearby.utils.pref.AppReference
 
 class RecogniseActivity : AppCompatActivity(), GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
     private lateinit var googleApiClient: GoogleApiClient
     private lateinit var broadcastManager: BroadcastReceiver
+    private var isEnter = false
 
     private fun handleActivityRecognise(type: Int, confident: Int) {
         var labelType = ""
@@ -52,11 +56,13 @@ class RecogniseActivity : AppCompatActivity(), GoogleApiClient.ConnectionCallbac
             tvConfidence.text = "Confidence : $confident"
         }
         btnStartTrack.isEnabled = true
+        tvCount.text = "$isEnter"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true)
         super.onCreate(savedInstanceState)
+        d("create")
         setContentView(R.layout.activity_recognise)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         buildGoogleClient()
@@ -65,21 +71,20 @@ class RecogniseActivity : AppCompatActivity(), GoogleApiClient.ConnectionCallbac
         startTracking()
     }
 
-    private fun initBroadcast() {
-        broadcastManager = object : BroadcastReceiver() {
-            override fun onReceive(context: Context?, intent: Intent?) {
-                if (intent == null) return
-                if (intent.action == Constant.BROADCAST_DETECT_ACTIVITY) {
-                    val type = intent?.getIntExtra("type", -1)
-                    val confident = intent?.getIntExtra("confidence", 0)
-                    handleActivityRecognise(type, confident)
-                }
-            }
-        }
+    override fun onRestart() {
+        super.onRestart()
+        e("resume")
+    }
+
+    override fun onStart() {
+        super.onStart()
+        d("on start")
+        tvCount.text = "$isEnter"
     }
 
     override fun onResume() {
         super.onResume()
+        d("on resume")
         LocalBroadcastManager.getInstance(this)
                 .registerReceiver(broadcastManager, IntentFilter(Constant.BROADCAST_DETECT_ACTIVITY))
     }
@@ -104,7 +109,7 @@ class RecogniseActivity : AppCompatActivity(), GoogleApiClient.ConnectionCallbac
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (item?.itemId == R.id.menu_change) {
-            startIntent<DemoActivity>(this)
+            startIntent<OrderActivity>(this)
         }
         if (item?.itemId == android.R.id.home) {
             finish()
@@ -138,6 +143,23 @@ class RecogniseActivity : AppCompatActivity(), GoogleApiClient.ConnectionCallbac
             val intent = Intent(this, BackgroundDetectedActivitiesService::class.java)
             stopService(intent)
             btnStartTrack.isEnabled = true
+        }
+        btnCount.setOnClickListener {
+            isEnter = !isEnter
+            tvCount.text = "$isEnter"
+        }
+    }
+
+    private fun initBroadcast() {
+        broadcastManager = object : BroadcastReceiver() {
+            override fun onReceive(context: Context?, intent: Intent?) {
+                if (intent == null) return
+                if (intent.action == Constant.BROADCAST_DETECT_ACTIVITY) {
+                    val type = intent?.getIntExtra("type", -1)
+                    val confident = intent?.getIntExtra("confidence", 0)
+                    handleActivityRecognise(type, confident)
+                }
+            }
         }
     }
 

@@ -9,7 +9,7 @@ import pq.khanh.vn.yournearby.utils.Constant
 /**
  * Created by khanhpq on 1/10/18.
  */
-class LikeHoodAdapter(private var likelihoodList: MutableList<String>) : RecyclerView.Adapter<LikeHoodHolder>() {
+class LikeHoodAdapter(private var likelihoodList: MutableList<String>, private val onClick: (Int) -> Unit) : RecyclerView.Adapter<LikeHoodHolder>() {
     private var isSwitch = true
 
     override fun onCreateViewHolder(parent: ViewGroup?, viewType: Int): LikeHoodHolder {
@@ -36,9 +36,10 @@ class LikeHoodAdapter(private var likelihoodList: MutableList<String>) : Recycle
     override fun onBindViewHolder(holder: LikeHoodHolder?, position: Int) {
         val item = likelihoodList[position]
         holder?.bind(item)
+        holder?.itemView?.setOnClickListener { onClick(position) }
     }
 
-    fun switchLayout() : Boolean{
+    fun switchLayout(): Boolean {
         isSwitch = !isSwitch
         return isSwitch
     }

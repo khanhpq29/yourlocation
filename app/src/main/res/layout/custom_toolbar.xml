@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="?attr/actionBarSize"
+    android:background="?attr/colorPrimary"
+    app:popupTheme="@style/AppTheme.PopupOverlay">
+    <ImageView
+        android:id="@+id/icBack"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_arrow_back"/>
+    <FrameLayout
+        style="?attr/actionButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/badge_container"
+        android:layout_gravity="end"
+        android:clipToPadding="false"
+        android:focusable="true">
+
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            app:srcCompat="@drawable/ic_shopping_cart" />
+
+        <TextView
+            android:id="@+id/tvBadge"
+            android:layout_width="21dp"
+            android:layout_height="21dp"
+            android:layout_gravity="top|end"
+            android:layout_marginEnd="-5dp"
+            android:layout_marginTop="3dp"
+            android:background="@drawable/badge_bg"
+            android:gravity="center"
+            android:textColor="@android:color/white"
+            android:textSize="8sp"
+            tools:text="55" />
+    </FrameLayout>
+
+</android.support.v7.widget.Toolbar>
