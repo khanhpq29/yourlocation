@@ -23,6 +23,7 @@ import pq.khanh.vn.yournearby.extensions.e
 import pq.khanh.vn.yournearby.extensions.startIntent
 import pq.khanh.vn.yournearby.service.BackgroundDetectedActivitiesService
 import pq.khanh.vn.yournearby.ui.example.DemoActivity
+import pq.khanh.vn.yournearby.ui.items.ItemsActivity
 import pq.khanh.vn.yournearby.ui.order.OrderActivity
 import pq.khanh.vn.yournearby.utils.Constant
 
@@ -109,7 +110,7 @@ class RecogniseActivity : AppCompatActivity(), GoogleApiClient.ConnectionCallbac
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         if (item?.itemId == R.id.menu_change) {
-            startIntent<OrderActivity>(this)
+            startIntent<ItemsActivity>(this)
         }
         if (item?.itemId == android.R.id.home) {
             finish()

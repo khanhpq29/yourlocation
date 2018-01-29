@@ -38,7 +38,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.SplashActivity" />
+        <activity android:name=".ui.add.AddActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"/>
 
         <service
             android:name=".service.ActivityService"
@@ -47,11 +48,11 @@
 
         <activity android:name=".ui.example.DemoActivity" />
         <activity android:name=".ui.calendar.CalendarActivity" />
-        <activity android:name=".ui.order.OrderActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-
-        </activity>
-        <activity android:name=".ui.order.DetailOrderActivity"></activity>
+        <activity
+            android:name=".ui.order.OrderActivity"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity android:name=".ui.order.DetailOrderActivity" />
+        <activity android:name=".ui.items.ItemsActivity"></activity>
     </application>
 
 </manifest>

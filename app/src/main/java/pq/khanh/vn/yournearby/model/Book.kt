@@ -2,12 +2,32 @@ package pq.khanh.vn.yournearby.model
 
 import android.os.Parcel
 import android.os.Parcelable
+import io.realm.RealmObject
+import io.realm.annotations.PrimaryKey
+import io.realm.annotations.RealmClass
 
 /**
  * Created by khanhpq on 1/25/18.
  */
-data class Book(var total: Int, val name: String) : Parcelable {
+@RealmClass
+open class Book(@PrimaryKey open var id: Long = 0L, var total: Int = 0, var name: String = "") : RealmObject(), Parcelable {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Book
+
+        if (id != other.id) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        return id.hashCode()
+    }
+
     constructor(source: Parcel) : this(
+            source.readLong(),
             source.readInt(),
             source.readString()
     )
@@ -15,6 +35,7 @@ data class Book(var total: Int, val name: String) : Parcelable {
     override fun describeContents() = 0
 
     override fun writeToParcel(dest: Parcel, flags: Int) = with(dest) {
+        writeLong(id)
         writeInt(total)
         writeString(name)
     }

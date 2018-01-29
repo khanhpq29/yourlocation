@@ -7,4 +7,5 @@ import pq.khanh.vn.yournearby.model.Book
  */
 interface DetailView{
     fun afterBook()
+    fun updateItem(book: Book)
 }

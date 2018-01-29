@@ -1,6 +1,7 @@
 package pq.khanh.vn.yournearby.ui.order
 
 import android.content.Context
+import io.realm.Realm
 import pq.khanh.vn.yournearby.model.Book
 import pq.khanh.vn.yournearby.utils.pref.AppReference
 
@@ -12,5 +13,12 @@ class DetailPresenter(val view : DetailView) {
         AppReference.setRestNumber(context, number)
         book.total = book.total - number
         view.afterBook()
+    }
+
+    fun updateItem(realm : Realm, book: Book){
+        realm.executeTransaction { realmObj ->
+            realmObj.copyToRealmOrUpdate(book)
+        }
+        view.updateItem(book)
     }
 }

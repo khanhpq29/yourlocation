@@ -5,28 +5,42 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.view.Menu
 import android.view.MenuItem
+import io.reactivex.disposables.CompositeDisposable
+import io.realm.Realm
 import kotlinx.android.synthetic.main.activity_detail_order.*
 import pq.khanh.vn.yournearby.R
 import pq.khanh.vn.yournearby.extensions.hide
 import pq.khanh.vn.yournearby.extensions.show
-import pq.khanh.vn.yournearby.extensions.showToast
 import pq.khanh.vn.yournearby.model.Book
+import pq.khanh.vn.yournearby.utils.RxBus
 import pq.khanh.vn.yournearby.utils.pref.AppReference
 
 class DetailOrderActivity : AppCompatActivity(), DetailView {
     private lateinit var presenter: DetailPresenter
-        private lateinit var book : Book
-    override fun afterBook() {
-        showToast("success")
-    }
+    private lateinit var book: Book
+    private lateinit var realm: Realm
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail_order)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        Realm.init(this)
+        realm = Realm.getDefaultInstance()
         presenter = DetailPresenter(this)
         initLayout()
         setupListener()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        realm.close()
+    }
+    override fun afterBook() {
+        presenter.updateItem(realm, book)
+    }
+
+    override fun updateItem(book: Book) {
+        RxBus.send(book)
     }
 
     private fun initLayout() {
@@ -36,7 +50,7 @@ class DetailOrderActivity : AppCompatActivity(), DetailView {
             book = intent.getParcelableExtra("goods_name")
             tvGoodName.text = book.name
             tvTotalBook.text = selectNumber.toString()
-        }else {
+        } else {
             tvNoData.show()
             tvGoodName.hide(true)
             tvTotalBook.hide(true)

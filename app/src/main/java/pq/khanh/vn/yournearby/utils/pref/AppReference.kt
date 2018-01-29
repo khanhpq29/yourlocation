@@ -3,7 +3,6 @@ package pq.khanh.vn.yournearby.utils.pref
 import android.content.Context
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
-import pq.khanh.vn.yournearby.extensions.e
 
 /**
  * Created by khanhpq on 1/23/18.
